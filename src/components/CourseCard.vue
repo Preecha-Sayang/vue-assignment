@@ -1,17 +1,39 @@
 <template>
-  <div class="course-list">
-    <div class="course-card">
-      <h3>ชื่อคอร์ส: ...</h3>
-      <p>ราคา: ... บาท</p>
-      <button>เพิ่มในรายการโปรด</button>
-    </div>
+  <div class="course-card">
+    <h3>ชื่อคอร์ส: {{ props.course.title }}</h3>
+    <p>ราคา: {{ props.course.price }} บาท</p>
+    <button @click="toggleFavorite">
+      {{ isFavorite ? "💔 เอาออกจากรายการโปรด" : "❤️ เพิ่มในรายการโปรด" }}
+    </button>
   </div>
 </template>
 
 <script setup>
-// TODO: import { useFavoriteStore } แล้วเขียนฟังก์ชันเพิ่มคอร์สลง store
-// TODO: defineProps({ course: Object })
+import { useFavoriteStore } from "../stores/favorite";
+import { computed } from "vue";
+
+// รับ prop
+const props = defineProps({
+  course: Object
+});
+
+// ใช้ store
+const store = useFavoriteStore();
+
+// ใช้ computed เพื่อตรวจสอบ favorite (reactive)
+const isFavorite = computed(() => store.favorites.includes(props.course.title));
+
+// ฟังก์ชันเพิ่ม/เอาออก favorites
+function toggleFavorite() {
+  if (isFavorite.value) {
+    store.favorites = store.favorites.filter(c => c !== props.course.title);
+  } else {
+    store.addFavorite(props.course.title);
+  }
+}
 </script>
+
+
 
 <style scoped>
 .course-list {

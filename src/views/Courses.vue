@@ -2,31 +2,50 @@
   <div class="page-container">
     <header>
       <h2>📚 Course List</h2>
-      <!-- TODO: แสดงจำนวนคอร์สที่ถูกใจจาก store -->
-      <p>❤️ ถูกใจแล้ว 0 คอร์ส</p>
+      <!-- ✅ แสดงจำนวนคอร์สที่ถูกใจจาก store -->
+      <p>❤️ ถูกใจแล้ว {{ store.favorites.length }} คอร์ส</p>
     </header>
 
     <div class="form-section">
       <label>ชื่อผู้ใช้:</label>
-      <!-- TODO: v-model username -->
-      <input placeholder="กรอกชื่อของคุณ" />
+      <!-- ✅ ผูก v-model กับ store.username -->
+      <input v-model="store.username" placeholder="กรอกชื่อของคุณ" />
     </div>
 
     <div class="course-list">
-      <!-- TODO: Render CourseCard -->
+      <!-- ✅ Render CourseCard -->
+<CourseCard
+  v-for="course in courses"
+  :key="course.id"
+  :course="course"
+/>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue";
+import axios from "axios"; // ✅ import axios
+import { useFavoriteStore } from "../stores/favorite"; // ✅ import store
 import CourseCard from "../components/CourseCard.vue";
-// TODO: import axios
-// TODO: import { useFavoriteStore } จาก "../stores/favorite"
 
+const store = useFavoriteStore(); // ✅ ใช้ store
 const courses = ref([]);
-// TODO: ดึงข้อมูลจาก API ด้วย axios.get() แล้วเก็บใน courses
-// TODO: ใช้ store เพื่อเข้าถึง username และ favorites
+
+// ✅ ดึงข้อมูลจาก API
+onMounted(async () => {
+  const res = await axios.get("https://fakestoreapi.com/products");
+  courses.value = res.data;
+});
+
+// ✅ ฟังก์ชันเพิ่ม/เอาออกจาก favorites
+function toggleFavorite(courseTitle) {
+  if (store.favorites.includes(courseTitle)) {
+    store.favorites = store.favorites.filter((c) => c !== courseTitle);
+  } else {
+    store.addFavorite(courseTitle);
+  }
+}
 </script>
 
 <style scoped>
